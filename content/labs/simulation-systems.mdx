@@ -1,0 +1,60 @@
+---
+title: "Building Large-Scale Simulation Systems"
+description: "Exploring the architecture and performance considerations for building simulation systems that handle millions of entities."
+date: "2024-01-15"
+tags: ["simulation", "systems", "performance", "architecture"]
+published: true
+hero: "/images/labs/simulation-hero.jpg"
+---
+
+# Building Large-Scale Simulation Systems
+
+Simulation systems form the backbone of modern game engines and training platforms. This post explores the architectural patterns and performance optimizations we've developed for handling millions of entities in real-time.
+
+## Entity Component System Architecture
+
+At the core of our simulation framework is an Entity Component System (ECS) that enables efficient data-oriented design. By separating data from behavior, we achieve better cache locality and parallelization opportunities.
+
+```cpp
+// Simplified ECS structure
+struct Position {
+  float x, y, z;
+};
+
+struct Velocity {
+  float dx, dy, dz;
+};
+
+// Systems operate on component arrays
+void PhysicsSystem::update(float deltaTime) {
+  for (auto& [pos, vel] : entities<Position, Velocity>()) {
+    pos.x += vel.dx * deltaTime;
+    pos.y += vel.dy * deltaTime;
+    pos.z += vel.dz * deltaTime;
+  }
+}
+```
+
+## Spatial Partitioning
+
+For large-scale simulations, spatial partitioning is essential. We use a hierarchical grid system that adapts to entity density:
+
+- **Coarse-grained grid** for broad-phase collision detection
+- **Fine-grained cells** for narrow-phase interactions
+- **Dynamic rebalancing** as entities move between regions
+
+## Performance Metrics
+
+Our latest simulation system achieves:
+
+- **10M+ entities** simulated at 60 FPS
+- **Sub-millisecond** update times for physics systems
+- **Linear scaling** with entity count (up to tested limits)
+
+<Callout variant="tip">
+These optimizations are part of our open-source simulation framework. Check out our GitHub for implementation details.
+</Callout>
+
+## Future Directions
+
+We're exploring GPU-accelerated simulation using compute shaders and exploring distributed simulation architectures for cloud-based training platforms.
